@@ -1,12 +1,10 @@
-version: "3.9"
+ersion: "3.9"
 
 services:
   web:
     build: .
-    command: uvicorn pdd.main:pdd_app --host 0.0.0.0 --port 8080
+    command: uvicorn main:pdd_app --host 0.0.0.0 --port 8000
     restart: unless-stopped
-    env_file:
-      - pdd_app/.env
     ports:
       - "8000:8000"
     depends_on:
@@ -29,7 +27,6 @@ services:
     restart: unless-stopped
     command: redis-server --save "" --appendonly no
 
-
   nginx:
     build: ./nginx
     container_name: pdd_nginx
@@ -43,3 +40,5 @@ services:
 
 volumes:
   postgres_data:
+  static_volume:
+  media_volume:
