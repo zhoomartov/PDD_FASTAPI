@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    command: uvicorn pdd.main:pdd_app --host 0.0.0.0 --port 8080
+    restart: unless-stopped
+    env_file:
+      - pdd_app/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: pdd_redis
+    restart: unless-stopped
+    command: redis-server --save "" --appendonly no
+
+
+  nginx:
+    build: ./nginx
+    container_name: pdd_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
